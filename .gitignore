@@ -13,6 +13,9 @@ probe.png
 # 錄影型專案的暫存輸出
 _out/
 .cache/
+# 套了插件的暫存 HTML（render / record 自動產生）
+.studio.html
+shots-*.png
 
 # ===== 機敏資料 =====
 accounts.json
@@ -23,7 +26,14 @@ accounts.json
 # projects/ 底下只追蹤空白範本 _template
 projects/*
 !projects/_template/
+!projects/_template-錄影/
 CLAUDE.local.md
 
 # 設計／規格文件（含客戶內容）
 docs/
+
+# 兩個範本的原檔要追蹤（上面的 index.html / 腳本.md 規則是擋客戶專案用的）
+!projects/_template/index.html
+!projects/_template/腳本.md
+!projects/_template-錄影/index.html
+!projects/_template-錄影/腳本.md

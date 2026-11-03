@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>示範後台</title>
+<!-- 假的「真實系統」，只給範本試錄用。實際專案把 setup / prepare 裡的網址換成客戶系統即可，這個資料夾可以刪掉。 -->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  body { font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans CJK TC", sans-serif; background: #f8fafc; color: #0f172a; }
+  nav { display: flex; gap: 28px; padding: 16px 32px; background: #1e293b; }
+  nav a { color: #cbd5e1; text-decoration: none; font-size: 20px; }
+  nav a.on { color: #fff; font-weight: 700; }
+  main { padding: 32px; }
+  h1 { font-size: 30px; margin-bottom: 24px; }
+  .cards { display: flex; gap: 24px; }
+  .card { flex: 1; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 26px; }
+  .card b { display: block; font-size: 52px; margin-top: 8px; }
+  button { font-size: 20px; padding: 12px 24px; border-radius: 10px; border: 0; background: #2563eb; color: #fff; cursor: pointer; }
+  table { width: 100%; margin-top: 20px; border-collapse: collapse; font-size: 20px; background: #fff; }
+  td, th { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+  form { display: none; gap: 16px; align-items: end; margin-top: 20px; }
+  form.on { display: flex; }
+  label { display: flex; flex-direction: column; gap: 6px; font-size: 18px; }
+  input { font-size: 20px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; }
+  .bars { display: flex; gap: 18px; align-items: end; height: 360px; padding: 20px; background: #fff; border-radius: 14px; }
+  .bars div { flex: 1; background: #60a5fa; border-radius: 8px 8px 0 0; }
+</style>
+</head>
+<body>
+<nav><a href="#dashboard">首頁</a><a href="#orders">訂單</a><a href="#report">報表</a></nav>
+<main id="app"></main>
+<script>
+  const orders = () => JSON.parse(localStorage.getItem('orders') || '[{"name":"陳大文","amount":800},{"name":"林美玲","amount":2400}]')
+  const save = list => localStorage.setItem('orders', JSON.stringify(list))
+  const views = {
+    dashboard: () => `<h1>今日總覽</h1><div class="cards">
+      <div class="card" id="card-orders">今日訂單<b>${orders().length} 筆</b></div>
+      <div class="card">今日營收<b>$${orders().reduce((s, o) => s + o.amount, 0).toLocaleString()}</b></div></div>`,
+    orders: () => `<h1>訂單</h1><button id="add">新增訂單</button>
+      <form id="f"><label>客戶名稱<input id="n"></label><label>金額<input id="m" inputmode="numeric"></label><button>送出</button></form>
+      <table><tr><th>客戶</th><th>金額</th></tr>${orders().map(o => `<tr><td>${o.name}</td><td>$${o.amount}</td></tr>`).join('')}</table>`,
+    report: () => `<h1>營收報表（近 7 天）</h1><div class="bars">${[40, 65, 50, 80, 70, 95, 88].map(h => `<div style="height:${h}%"></div>`).join('')}</div>`,
+  }
+  function show() {
+    const v = location.hash.slice(1) || 'dashboard'
+    document.getElementById('app').innerHTML = views[v]()
+    document.querySelectorAll('nav a').forEach(a => a.classList.toggle('on', a.hash === `#${v}`))
+    if (v === 'orders') {
+      document.getElementById('add').onclick = () => document.getElementById('f').classList.add('on')
+      document.getElementById('f').onsubmit = (e) => {
+        e.preventDefault()
+        save([...orders(), { name: document.getElementById('n').value, amount: Number(document.getElementById('m').value) }])
+        show()
+      }
+    }
+  }
+  addEventListener('hashchange', show)
+  show()
+</script>
+</body>
+</html>
