@@ -17,6 +17,11 @@
 
 角色的畫法、動畫效果、輸出 MP4 的程式都已經做好，放在 `engine/`，每支影片共用。
 
+### 兩個原則（做任何決定前先想這兩條）
+
+1. **影片是拿來讓客人看懂的，不是拿來玩的。** 每一幕都要回答「客人看完知道了什麼」。炫的特效、粒子、轉場，只要沒有幫客人看懂，就不做。
+2. **盡量只花一點點 token。** 影片用「腳本＋HTML＋分幕檔」組出來，改一句字幕就是改一行，改一幕就只讀那一幕的檔、只重錄那一幕。不整支重讀、不整支重錄。這也是用 HTML 不用 canvas 的原因：canvas 改一個字要讀懂整段繪圖程式，花的 token 多好幾倍。
+
 > 為什麼不用 AI 生影片？AI 影片一次只能生幾秒、角色每段都會換臉、中文字常變亂碼。這套做法的角色從頭到尾都一樣，中文字一定正確，秒數也很精準。代價是畫風只有扁平插畫。
 
 ## 這個 repo 存的是「做影片的方法」，不是影片
@@ -44,7 +49,7 @@ repo 裡**沒有任何影片，也沒有任何客戶專案**，只有做影片�
 2. 只抽那一段檢查：`npm run shots -- projects/<名稱> --shots <那幕的秒數>`；
 3. 重新產生：`npm run render` → `npm run voice`，旁白會跟著新字幕一起更新。
 
-錄影型影片也一樣能分段來：錄影程式可以做成只重錄有改過的鏡頭，其他段直接用快取，不用整支重錄。
+錄影型影片是**一幕一個檔、一幕一段快取**，只重錄改過的幕，其他段直接接起來（見下方「錄影型影片」）。
 
 > 所以 `腳本.md`、`index.html`、`record.mjs` 才是「原檔」，mp4 只是輸出結果。少了 mp4 還能重新產生；少了原檔就只能整支重做。
 
@@ -128,21 +133,77 @@ AI 機器人：`robot:dim`（沒精神）、`robot:happy`（開心）、`robot:f
 
 `npm run voice -- projects/<名稱>` 會把 `index.html` 裡每一句字幕（`.sub`）念成語音，放在字幕出現的時間點，合進 `output.mp4` 存成 `output-voice.mp4`。字幕框上的說話者（`<b>`）不念。
 
-- 一句念不完時會自動加快語速（最快 260），還是念不完就印出警告，這時把字幕時間拉長。
+- 一句念不完時會自動加快語速（最快 ×1.37），還是念不完就印出警告，這時把字幕時間拉長。
 - 念法跟字幕不一樣（數字、編號、英文縮寫）時，在那個字幕元素加 `data-say="要念的字"`，例如 `data-say="例如零二四七、零六一五五"`。
-- `--voice` 換語音（`say -v '?'` 看有哪些），`--rate` 改基本語速（預設 190）。
+- 聲音來自**語音插件**（`studio.config.mjs`）：Mac 用 `tts-say`（美佳）、Windows 用 `tts-windows`（內建中文語音）、Docker 用 `tts-edge`（微軟線上語音）。`--tts edge` 指定、`--speed 1.1` 改基本語速（舊的 `--rate 190` 也還能用）。
 
-## 錄影型影片（真實網站＋示意畫面）
+## 錄影型影片（真實網站分幕錄影）
 
-想讓客人看到「真的在跑的系統」時用這種：`index.html` 是一個 1920×1080 的舞台，裡面用 iframe 嵌本機跑起來的真實網站，旁邊再放示意畫面（後台、LINE 等）。由專案裡的 `record.mjs`（Playwright）自動操作網站、切換示意畫面，邊做邊錄。
+### 為什麼要分幕
 
-- 重錄步驟寫在該專案 `腳本.md` 的「錄影前準備」。
-- 錄影：`node projects/<名稱>/record.mjs` → `output.mp4`＋`subs.json`（每句字幕在錄影當下出現的時間）。
-- 旁白：一樣跑 `npm run voice -- projects/<名稱>`；`voice.js` 看到 `subs.json` 就改用它，`say` 欄位是念法。
-- 注意：用 Playwright 自帶的 headless shell 錄（Mac 版 Chrome 無頭模式只錄得到 993px 高）；不要把正式資料、真實客人個資錄進去；送出類動作用 `page.route` 攔截回假結果，不寫進任何資料庫。
+想像拍一支 demo：後台首頁、新增訂單、報表三段。拍完一週後，客戶把**首頁（Dashboard）改版了**。
+
+- 以前：整支片是一個程式從頭錄到尾，只能整支重錄，連沒改的報表那段也要重錄。
+- 現在：每一幕是一個獨立的檔案、錄成獨立的一小段影片放在快取。首頁改版 → 只重錄「畫面裡有出現首頁」的那幾幕，其他幕直接拿快取接起來。
+
+但「哪幾幕有出現首頁」不一定只有第 1 幕。例如「新增訂單」最後會回首頁看數字變多，所以它也跟首頁有關。這種**關聯**寫在每一幕的 `pages` 欄位裡，系統哪一頁改了，一個指令就找得出所有要重錄的幕。
+
+### 專案長相（`npm run new -- <名稱> --錄影`，複製自 `projects/_template-錄影`）
+
+```
+video.config.mjs     目錄：舞台尺寸、網站視窗位置、頁面清單（pages）、分幕順序（scenes）
+index.html           舞台：步驟標題、網站視窗外框、字幕（window.S.sub / step / end / reset）
+scenes/01-總覽.mjs    一幕一個檔：{ title, pages: ['dashboard'], prepare(), run() }
+腳本.md               分幕跟 scenes/ 一一對應，每幕多一行「頁面」
+.cache/scenes/        每幕錄好的小段（不進 git；淺色、深色分開放）
+```
+
+### 常用指令
+
+| 情境 | 指令 |
+|------|------|
+| 看每一幕的狀態（已錄／程式有改／還沒錄） | `npm run record -- projects/<名稱> --list` |
+| 改了某幾幕的程式，只重錄那幾幕 | `npm run record -- projects/<名稱>`（自動挑出有改的） |
+| 系統的 Dashboard 改版了，先看會影響哪幾幕 | `npm run record -- projects/<名稱> --page dashboard --dry` |
+| 確認後重錄那幾幕 | `npm run record -- projects/<名稱> --page dashboard` |
+| 指定重錄第 2、5 幕 | `npm run record -- projects/<名稱> --scene 2,5` |
+| 整支重錄 | `npm run record -- projects/<名稱> --all` |
+| 深色版 | 加 `--theme dark` → `output-dark.mp4` |
+
+**增刪改幕（CRUD）**：新增＝在 `scenes/` 加檔案＋在 `video.config.mjs` 的 `scenes` 加一行；刪除＝拿掉那一行（快取會自動清）；調順序＝換行的順序（**不用重錄**，直接重接）；修改＝改那個檔（自動判斷要重錄）。
+
+### 寫分幕的規則
+
+- **每一幕都要能單獨重錄**：需要的資料、登入狀態、停在哪一頁，寫在 `prepare()`（不錄影），不能靠上一幕留下的狀態。
+- `pages` 照實寫畫面裡出現過的系統頁面，漏寫就會在改版時漏重錄。
+- `ctx` 有：`narrate(字幕, 念法?)`、`tap(page, locator)`、`type(page, locator, 文字)`、`wait(ms)`、`S('step', n, 標題)`、`win.<視窗名>`、`file('相對路徑')`，以及 step 插件加的動作（如 `highlight`）。
+- 不要把正式資料、真實客人個資錄進去；送出類動作用 `page.route` 攔截回假結果，不寫進任何資料庫。
+- 舊的錄影型專案（自己帶 `record.mjs` 的，如小黑貓、一定發）照舊用 `node projects/<名稱>/record.mjs` 錄；要改成分幕，就照範本把各幕拆到 `scenes/`。
+
+## 插件與主題
+
+全站要載入哪些插件寫在根目錄的 `studio.config.mjs`；單一支影片要不同設定，在專案資料夾放同名檔案覆蓋。插件分五種：
+
+| 種類 | 做什麼 | 內建 |
+|------|--------|------|
+| theme | 換整支片的配色 | `theme-dark`（深色） |
+| tts | 旁白聲音 | `tts-say`、`tts-windows`、`tts-edge` |
+| character | 新角色 | `char-cat`（範例：一隻貓） |
+| step | 錄影型分幕裡可以用的動作 | `step-basic`（highlight、scrollTo） |
+| hook | 在錄完／輸出完時多做一件事 | （無，寫法見 PLUGINS.md） |
+
+深色版：`npm run render -- projects/<名稱> --theme dark`（動畫型）或 `npm run record -- projects/<名稱> --theme dark`（錄影型），接著 `npm run voice -- projects/<名稱> --theme dark`。插件怎麼寫、規範有哪些 → **[PLUGINS.md](PLUGINS.md)**。
+
+## Windows 與 Docker
+
+- 先跑 `npm run doctor`：會列出這台電腦缺什麼、怎麼裝（Mac、Windows、Linux 都適用）。
+- **Windows**：`winget install OpenJS.NodeJS.LTS Gyan.FFmpeg` → `npm install` → `npx playwright install chromium`。旁白自動改用 Windows 內建中文語音（設定 → 時間與語言 → 語音 → 新增「中文(台灣)」）；想要更自然的聲音就 `pip install edge-tts`，加 `--tts edge`。
+- **Docker**（什麼都不用裝）：`npm run docker:build` 一次，之後
+  `docker run --rm -v "$PWD/projects:/app/projects" offical-animation render projects/<名稱> --theme dark`
+  （指令換成 `record`、`voice`、`doctor` 都可以；Windows PowerShell 用 `"${PWD}\projects"`）。Docker 裡的旁白用 `tts-edge`，需要網路。
 
 ## 目前不支援
 
 - **配樂**：沒有背景音樂。要的話把 `output-voice.mp4` 丟進剪映再加。
-- **旁白音色**：`voice.js` 用 macOS 內建的「美佳」（Meijia，台灣中文），只能在 Mac 上跑，聲音偏機器。要更自然的人聲，一樣丟進剪映用 AI 配音。
+- **旁白音色**：內建語音偏機器。要更自然的人聲，用 `tts-edge`，或丟進剪映用 AI 配音。
 - **複雜動作**：例如走路時腿會動、手勢，這類只能用簡單位移代替。
