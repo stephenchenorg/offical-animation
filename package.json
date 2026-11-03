@@ -6,7 +6,10 @@
     "new": "node new.js",
     "render": "node render.js",
     "shots": "node render.js",
-    "voice": "node voice.js"
+    "voice": "node voice.js",
+    "record": "node record.mjs",
+    "doctor": "node doctor.mjs",
+    "docker:build": "docker build -t offical-animation ."
   },
   "dependencies": {
     "puppeteer": "^25.16.0"

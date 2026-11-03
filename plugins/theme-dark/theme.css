@@ -1,0 +1,36 @@
+/* 深色主題。規範：所有選擇器都要掛在 html[data-theme="dark"] 底下，不影響淺色版。 */
+
+/* ── 主題變數（錄影型舞台用，規範見 PLUGINS.md「主題變數」） */
+html[data-theme="dark"] {
+  --bg: #0b1220;
+  --panel: #111a2e;
+  --line: #24314d;
+  --fg: #e5edf8;
+  --muted: #94a3b8;
+  --accent: #60a5fa;
+  --sub-bg: rgba(2, 6, 23, .88);
+  --sub-fg: #f8fafc;
+}
+
+/* ── 動畫型引擎（engine/effects.css）的元件 */
+html[data-theme="dark"] .bg-blue   { background: linear-gradient(180deg, #0f1d3a 0%, #13254a 60%, #0f1d3a 100%); }
+html[data-theme="dark"] .bg-grey   { background: linear-gradient(180deg, #111827 0%, #1f2937 55%, #111827 100%); }
+html[data-theme="dark"] .bg-slate  { background: linear-gradient(180deg, #0f172a 0%, #1e293b 55%, #0f172a 100%); }
+html[data-theme="dark"] .bg-green  { background: linear-gradient(180deg, #052e1c 0%, #0b2a24 50%, #0f1d3a 100%); }
+html[data-theme="dark"] .bg-bright { background: linear-gradient(180deg, #13254a 0%, #0b2a33 50%, #0b2a1f 100%); }
+
+html[data-theme="dark"] .bubble { background: #1e293b; color: #dbeafe; box-shadow: 0 6px 18px rgba(0,0,0,.45); }
+html[data-theme="dark"] .card { background: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
+html[data-theme="dark"] .card.bad { color: #fca5a5; border-color: #7f1d1d; }
+html[data-theme="dark"] .card.good { color: #86efac; border-color: #14532d; }
+html[data-theme="dark"] .board { background: #111a2e; border-color: #334155; box-shadow: 0 14px 40px rgba(0,0,0,.5); }
+html[data-theme="dark"] .board-dim { background: rgba(11,18,32,.9); }
+html[data-theme="dark"] .doc { background-color: #1e293b; border-color: #94a3b8;
+  background-image: repeating-linear-gradient(180deg, transparent 0 22px, #475569 22px 28px); }
+html[data-theme="dark"] .hour { background: #450a0a; color: #fca5a5; }
+html[data-theme="dark"] .sub span { background: rgba(2,6,23,.88); box-shadow: 0 0 0 2px #1e293b; }
+html[data-theme="dark"] .end { background: linear-gradient(160deg, #0b1b4d 0%, #083344 50%, #052e16 100%); }
+
+/* 白板／卡片裡常見的深色字，在深底上提亮 */
+html[data-theme="dark"] .board,
+html[data-theme="dark"] .board * { color: #e5edf8; }
