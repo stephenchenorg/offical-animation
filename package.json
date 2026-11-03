@@ -9,7 +9,7 @@
     "voice": "node voice.js"
   },
   "dependencies": {
-    "puppeteer": "^24.36.1"
+    "puppeteer": "^25.16.0"
   },
   "devDependencies": {
     "playwright": "^1.58.2"
