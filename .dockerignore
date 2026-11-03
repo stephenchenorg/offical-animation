@@ -1,0 +1,6 @@
+node_modules
+projects
+docs
+*.mp4
+.git
+.cache
