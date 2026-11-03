@@ -1,0 +1,17 @@
+{
+  "name": "offical-animation",
+  "private": true,
+  "description": "用 HTML 做說明動畫並輸出 MP4（客戶提案、方案說明短片）",
+  "scripts": {
+    "new": "node new.js",
+    "render": "node render.js",
+    "shots": "node render.js",
+    "voice": "node voice.js"
+  },
+  "dependencies": {
+    "puppeteer": "^24.36.1"
+  },
+  "devDependencies": {
+    "playwright": "^1.58.2"
+  }
+}

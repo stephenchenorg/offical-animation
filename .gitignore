@@ -1,0 +1,29 @@
+# ===== 依賴與系統檔 =====
+node_modules/
+.DS_Store
+
+# ===== 產出物（可由腳本 / index.html 重新產生，不進 git）=====
+# 影片成品：output.mp4、output-voice.mp4、成品.mp4、片頭片尾、試聽片段……一律不推
+*.mp4
+*.mov
+*.webm
+# render.js --shots 檢查用拼圖
+shots.png
+probe.png
+# 錄影型專案的暫存輸出
+_out/
+.cache/
+
+# ===== 機敏資料 =====
+accounts.json
+.env
+.env.*
+
+# ===== 客戶專案：只留在本機，不進 git =====
+# projects/ 底下只追蹤空白範本 _template
+projects/*
+!projects/_template/
+CLAUDE.local.md
+
+# 設計／規格文件（含客戶內容）
+docs/

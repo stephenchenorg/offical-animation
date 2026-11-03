@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>影片標題</title>
+<link rel="stylesheet" href="../../engine/effects.css">
+</head>
+<body>
+<!-- data-total＝影片總秒數；要做 16:9 橫式就加 class="stage landscape" -->
+<div class="stage" id="stage" data-total="14">
+
+  <!-- 第 1 幕｜問題 0–5s -->
+  <section class="scene bg-grey" data-show="0,5.3">
+    <div class="abs up" data-show="0,5.3" style="left:370px;top:300px;width:340px" data-char="client:frown"></div>
+    <div class="abs bubble" data-show="0.6,5" style="left:90px;top:520px">這個怎麼辦？</div>
+    <div class="abs pop" data-show="2.5,5.3" style="left:0;right:0;top:1000px;text-align:center"><span class="card bad" style="display:inline-block">❌ 遇到的問題</span></div>
+    <div class="abs sub" data-show="0.3,5"><span>旁白：說明客戶遇到的問題。</span></div>
+  </section>
+
+  <!-- 第 2 幕｜解方 5–11s -->
+  <section class="scene bg-green" data-show="5,11.3">
+    <div class="abs tag pop" data-show="5,11.3" style="top:290px"><span style="background:#16a34a">我們的做法</span></div>
+    <div class="abs board up" data-show="5.2,11.3" style="left:140px;top:420px;width:800px;height:440px">
+      <svg viewBox="0 0 772 412" width="772" height="412">
+        <rect class="draw" data-show="6,11.3" x="60" y="60" width="260" height="110" rx="18" fill="none" stroke="#2563eb" stroke-width="8"/>
+        <text data-show="6.4,11.3" x="190" y="130" font-size="42" font-weight="800" text-anchor="middle" fill="#1d4ed8">步驟一</text>
+        <path class="draw" data-show="6.8,11.3" d="M335 115 H430 M406 92 L434 115 L406 138" fill="none" stroke="#64748b" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect class="draw" data-show="7.2,11.3" x="450" y="60" width="260" height="110" rx="18" fill="none" stroke="#16a34a" stroke-width="8"/>
+        <text data-show="7.6,11.3" x="580" y="130" font-size="42" font-weight="800" text-anchor="middle" fill="#15803d">步驟二</text>
+      </svg>
+      <div class="abs board-dim" data-show="8.8,11.3"></div>
+    </div>
+    <div class="abs pop" data-show="9,11.3" style="left:0;right:0;top:560px;text-align:center"><span class="card good" style="display:inline-block">✅ 帶來的好處</span></div>
+    <div class="abs" data-show="5,11.3" style="left:60px;top:990px;width:300px" data-char="client:smile"></div>
+    <div class="abs walk-in" data-show="5.3,11.3" style="left:720px;top:990px;width:300px" data-char="us"></div>
+    <div class="abs sub eng" data-show="5.8,11"><span><b>我方</b>角色台詞寫在這裡。</span></div>
+  </section>
+
+  <!-- 片尾 11–14s -->
+  <section class="scene bg-bright" data-show="11,15">
+    <div class="abs end" data-show="11,15">
+      <h1>客戶名稱</h1>
+      <h2>專案名稱</h2>
+    </div>
+  </section>
+
+  <div class="abs progress" id="progress"></div>
+</div>
+<div class="hint">點畫面重新播放 ・ 按 R 重播</div>
+
+<script src="../../engine/characters.js"></script>
+<script>
+  // 角色登記：名字自己取，data-char="名字:表情" 就會畫出來
+  Anim.cast({
+    client: Anim.person({ hair: 'bob', outfit: 'blazer', color: '#1F3B73', item: 'phone' }),
+    us: Anim.person({ hair: 'spiky', hairColor: '#2a1d14', outfit: 'hoodie', color: '#22A06B', item: 'laptop', mood: 'smile' }),
+    robot: Anim.robot,
+  })
+</script>
+<script src="../../engine/player.js"></script>
+</body>
+</html>

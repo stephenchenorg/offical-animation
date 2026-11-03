@@ -1,0 +1,134 @@
+/* 效果庫：舞台、背景、字幕、字卡、進場動畫。每支影片共用，專案只寫自己的版面 */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; background: #0b1220; overflow: hidden; }
+body { display: flex; align-items: center; justify-content: center;
+  font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif; }
+
+/* ── 舞台：預設 9:16 直式 1080×1920；加 .landscape 變成 16:9 橫式 1920×1080 ── */
+.stage { position: relative; width: 1080px; height: 1920px; overflow: hidden;
+  transform-origin: center center; flex: none; cursor: pointer; }
+.stage.landscape { width: 1920px; height: 1080px; }
+.abs { position: absolute; }
+.scene { position: absolute; inset: 0; }
+
+/* ── 時間軸：[data-show] 預設隱藏，播到時加上 .on ── */
+[data-show] { opacity: 0; transition: opacity .45s ease; }
+[data-show].on { opacity: 1; }
+body.seeking [data-show] { transition: none; }
+
+/* ── 場景背景（色調代表情緒：藍＝目標、灰＝卡關、綠＝解方、亮＝結尾） ── */
+.bg-blue { background: linear-gradient(180deg, #dbeafe 0%, #eff6ff 60%, #dbeafe 100%); }
+.bg-grey { background: linear-gradient(180deg, #e5e7eb 0%, #f3f4f6 55%, #d1d5db 100%); }
+.bg-slate { background: linear-gradient(180deg, #e2e8f0 0%, #f8fafc 55%, #e2e8f0 100%); }
+.bg-green { background: linear-gradient(180deg, #dcfce7 0%, #f0fdf4 50%, #dbeafe 100%); }
+.bg-bright { background: linear-gradient(180deg, #bfdbfe 0%, #ecfeff 50%, #bbf7d0 100%); }
+
+/* ── 進場動畫：加在有 data-show 的元素上 ── */
+.up.on { animation: up .6s ease-out both; }                         /* 往上浮出 */
+@keyframes up { from { transform: translateY(60px); opacity: 0; } to { transform: none; opacity: 1; } }
+.pop.on { animation: pop .45s cubic-bezier(.3,1.6,.5,1) both; }     /* 彈出 */
+@keyframes pop { from { transform: scale(.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.walk-in.on { animation: walkIn 1.6s ease-out both; }               /* 從右邊一跳一跳走進來 */
+@keyframes walkIn {
+  0% { transform: translateX(560px) } 20% { transform: translateX(450px) translateY(-14px) }
+  40% { transform: translateX(330px) } 60% { transform: translateX(200px) translateY(-14px) }
+  80% { transform: translateX(80px) } 100% { transform: none }
+}
+.shake.on { animation: shake .5s ease-in-out 2; }                   /* 左右晃（鎖頭） */
+@keyframes shake { 0%,100% { transform: rotate(0) } 25% { transform: rotate(-8deg) } 75% { transform: rotate(8deg) } }
+.nod-no.on { animation: noNo 1.4s ease-in-out var(--delay, 0s); }   /* 搖頭，--delay 控制幾秒後開始 */
+@keyframes noNo { 0%,100% { transform: translateX(0) } 20%,60% { transform: translateX(-14px) } 40%,80% { transform: translateX(14px) } }
+
+/* ── SVG 手繪效果：線條像用筆畫出來 ── */
+.draw { stroke-dasharray: 1400; stroke-dashoffset: 1400; }
+.draw.on { animation: draw 1s ease-out forwards; }
+@keyframes draw { to { stroke-dashoffset: 0 } }
+.bar { transform-box: fill-box; transform-origin: bottom; }          /* 長條往上長 */
+.bar.on { animation: grow .6s ease-out both; }
+@keyframes grow { from { transform: scaleY(0) } to { transform: scaleY(1) } }
+.bar-x { transform-box: fill-box; transform-origin: left; }          /* 長條往右長 */
+.bar-x.on { animation: growX 1s ease-out both; }
+@keyframes growX { from { transform: scaleX(0) } to { transform: scaleX(1) } }
+.spin { transform-box: view-box; transform-origin: 100px 100px; }    /* 時鐘指針（viewBox 200×200） */
+.spin.on { animation: spin 1.2s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg) } }
+
+/* ── 元件 ── */
+/* 訊息泡泡：往上飄走 */
+.bubble { padding: 18px 30px; border-radius: 30px 30px 30px 8px; background: #fff;
+  box-shadow: 0 6px 18px rgba(30,64,175,.18); font-size: 40px; color: #1e3a8a; white-space: nowrap; }
+.bubble.on { animation: floatUp 2.6s ease-out forwards; }
+@keyframes floatUp {
+  0% { transform: translateY(80px) scale(.6); opacity: 0; }
+  20% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-260px); opacity: 0; }
+}
+
+/* 烏雲：飄下來後上下浮動 */
+.cloud.on { animation: cloudIn .8s ease-out both, bob 2s ease-in-out .8s infinite; }
+@keyframes cloudIn { from { transform: translateY(-40px); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
+
+/* 字卡：.bad 紅色（❌ 問題）、.good 綠色（✅ 好處） */
+.card { padding: 22px 40px; border-radius: 26px; font-size: 54px; font-weight: 800;
+  background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,.15); white-space: nowrap; }
+.card.bad { color: #b91c1c; border: 5px solid #fecaca; }
+.card.good { color: #15803d; border: 5px solid #bbf7d0; }
+
+/* 段落標題膠囊：「做法一｜…」 */
+.tag { left: 0; right: 0; text-align: center; }
+.tag span { display: inline-block; padding: 20px 50px; border-radius: 50px; color: #fff; background: #475569;
+  font-size: 56px; font-weight: 900; box-shadow: 0 8px 24px rgba(0,0,0,.15); }
+
+/* 文件：從左滑到右（--dx 滑多遠） */
+.doc { width: 90px; height: 110px; border-radius: 10px; background: #fff; border: 6px solid #64748b;
+  background-image: repeating-linear-gradient(180deg, transparent 0 22px, #cbd5e1 22px 28px);
+  background-origin: content-box; padding: 18px 12px; }
+.doc.on { animation: moveDoc 1.5s ease-in-out forwards; }
+@keyframes moveDoc { 0% { transform: translateX(0); opacity: 0 } 15% { opacity: 1 } 85% { opacity: 1 }
+  100% { transform: translateX(var(--dx, 360px)); opacity: 0 } }
+
+/* 小標籤：「+1 工時」 */
+.hour { padding: 12px 26px; border-radius: 20px; background: #fee2e2; color: #b91c1c;
+  font-size: 42px; font-weight: 900; white-space: nowrap; }
+
+/* 資料方塊：飛到 (--dx, --dy) 後消失 */
+.cube { width: 56px; height: 56px; border-radius: 12px;
+  background: linear-gradient(135deg, #60a5fa, #34d399); box-shadow: 0 0 24px rgba(96,165,250,.8); }
+.cube.on { animation: flyIn 1s ease-in forwards; }
+@keyframes flyIn { 0% { opacity: 0 } 15% { opacity: 1 } 90% { opacity: 1 }
+  100% { transform: translate(var(--dx), var(--dy)) scale(.3); opacity: 0 } }
+
+/* 光暈：一縮一放 */
+.glow { border-radius: 50%; background: radial-gradient(circle, rgba(52,211,153,.55), rgba(96,165,250,0) 70%); }
+.glow.on { animation: glow 1.4s ease-in-out infinite alternate; }
+@keyframes glow { from { transform: scale(.85) } to { transform: scale(1.1) } }
+
+/* 彩色對話泡泡（多語系回答） */
+.lang { padding: 20px 34px; border-radius: 34px; font-size: 42px; font-weight: 700; color: #fff;
+  box-shadow: 0 8px 20px rgba(0,0,0,.15); white-space: nowrap; }
+
+/* 白板 */
+.board { background: #fff; border: 14px solid #cbd5e1; border-radius: 28px; box-shadow: 0 14px 40px rgba(0,0,0,.12); }
+.board-dim { inset: 0; background: rgba(255,255,255,.9); border-radius: 14px; }
+
+/* ── 字幕：畫面中下方大字。<b> 是說話者，.vendor 灰、.eng 綠，預設藍 ── */
+.sub { left: 70px; right: 70px; top: 1330px; text-align: center; }
+.landscape .sub { top: 860px; }
+.sub span { display: inline-block; padding: 26px 40px; border-radius: 28px; background: rgba(15,23,42,.82);
+  color: #fff; font-size: 54px; line-height: 1.45; font-weight: 700; }
+.sub b { display: block; font-size: 36px; color: #93c5fd; margin-bottom: 6px; }
+.sub.vendor b { color: #d1d5db; }
+.sub.eng b { color: #86efac; }
+
+/* ── 片尾字卡 ── */
+.end { inset: 0; background: linear-gradient(160deg, #1d4ed8 0%, #0e7490 50%, #15803d 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; gap: 30px; }
+.end h1 { font-size: 120px; letter-spacing: 8px; }
+.end h2 { font-size: 72px; font-weight: 700; padding: 18px 50px; border: 4px solid rgba(255,255,255,.7); border-radius: 60px; }
+
+/* ── 播放 UI（錄影時隱藏） ── */
+.progress { left: 0; top: 0; height: 10px; background: linear-gradient(90deg, #3b82f6, #22c55e); width: 0; }
+.hint { position: fixed; bottom: 14px; left: 0; right: 0; text-align: center; color: #94a3b8; font-size: 14px; }
+body.record .hint, body.record .progress { display: none; }
