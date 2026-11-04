@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // 加旁白：node voice.js projects/<名稱> [--theme dark] [--tts say|windows|edge] [--speed 1]
-//   → 把每句字幕念成語音，放在字幕出現的時間點，合進 output.mp4 → output-voice.mp4
-//     （--theme dark 時讀 output-dark.mp4 → output-dark-voice.mp4）
+//   → 把每句字幕念成語音，放在字幕出現的時間點，合進 output.mp4 → <資料夾名>.mp4
+//     （成品檔名＝所在資料夾名，例如 projects/濂達/不卡控說明 → 不卡控說明.mp4；已存在就覆寫）
+//     （--theme dark 時讀 output-dark.mp4 → <資料夾名>-dark.mp4）
 // 語音來源是 tts 插件（studio.config.mjs）：Mac 用 say、Windows 用內建語音、Docker 用 edge-tts
 // 念法跟字幕不一樣時（數字、英文縮寫、符號），在字幕元素上加 data-say="要念的字"
 // 錄影型專案（字幕時間在錄影當下才決定）改讀專案裡的 subs.json：[{ a, b, text, say? }]
@@ -70,7 +71,9 @@ async function main() {
     const inputs = clips.flatMap(c => ['-i', c.f])
     const delays = clips.map((c, i) => `[${i + 1}]adelay=${c.ms}|${c.ms}[a${i}]`).join(';')
     const mix = `${clips.map((_, i) => `[a${i}]`).join('')}amix=inputs=${clips.length}:normalize=0,apad=whole_dur=${duration(video)}[aout]`
-    const out = path.resolve(dir, outName(studio.themeName, 'output', 'mp4').replace(/\.mp4$/, '-voice.mp4'))
+    // 有聲成品一律跟所在資料夾同名（取最後一層資料夾名）
+    const out = path.resolve(dir, outName(studio.themeName, path.basename(path.resolve(dir)), 'mp4'))
+    if (out === video) throw new Error(`資料夾名跟原片同名（${path.basename(out)}），會蓋掉原片，請改資料夾名`)
     ffmpeg(['-i', video, ...inputs, '-filter_complex', `${delays};${mix}`,
       // 靜音只補到影片長度（apad 不給長度會無限補下去，ffmpeg 8 配 -shortest 收不了尾）
       '-map', '0:v', '-map', '[aout]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '160k', '-shortest', out])

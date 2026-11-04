@@ -14,7 +14,7 @@
 3. 照腳本改 `index.html`。**先看參考範例**（本機 `CLAUDE.local.md` 有寫是哪一支），版面、座標、時間的寫法照它來。
 4. 檢查：`node render.js projects/<名稱> --shots <每幕挑 1～2 個時間點>`，Read `shots.png`，看字有沒有超框、角色有沒有被字卡或字幕擋住。有問題修完再抽一次。
 5. 使用者確認後 `node render.js projects/<名稱>` 輸出 `output.mp4`。
-6. **一律加旁白**（使用者 2026-10-27 指示，每支都要念出來）：接著跑 `node voice.js projects/<名稱>`（聲音來自 tts 插件，Mac 預設美佳）產生 `output-voice.mp4`，`open` 給使用者看的是這支有聲版。寫字幕時就先把數字、編號、英文縮寫的念法用 `data-say` 寫好；看 voice.js 的輸出，有 ⚠️ 念不完的就把字幕時間拉長再重跑。
+6. **一律加旁白**（使用者 2026-10-27 指示，每支都要念出來）：接著跑 `node voice.js projects/<名稱>`（聲音來自 tts 插件，Mac 預設美佳）產生跟資料夾同名的 `<名稱>.mp4`（例如 `projects/濂達/不卡控說明/不卡控說明.mp4`，取最後一層資料夾名；使用者 2026-11-04 指示，不再叫 `output-voice.mp4`），`open` 給使用者看的是這支有聲版。寫字幕時就先把數字、編號、英文縮寫的念法用 `data-say` 寫好；看 voice.js 的輸出，有 ⚠️ 念不完的就把字幕時間拉長再重跑。
 7. **客戶專案不進 git**：`projects/` 底下除了 `_template/`、`_template-錄影/` 全部列在 `.gitignore`，影片成品（`*.mp4`）、`shots.png` 也是。git 只追蹤工具本身（`engine/`、`plugins/`、`render.js`、`record.mjs`、`voice.js`、`new.js`、`doctor.mjs`、兩個 `_template*/`、README、PLUGINS.md、Dockerfile）。
 
 改動已經做好的影片時，`腳本.md` 和 `index.html` 要一起改，兩邊不能不一致。
@@ -42,7 +42,7 @@
 
 - 插件（主題 theme、語音 tts、角色 character、動作 step、掛勾 hook）寫在 `plugins/`，用 `studio.config.mjs` 開關。規範見 `PLUGINS.md`，新增或改插件後跑 `npm run doctor` 檢查。
 - 不要在 `render.js`／`voice.js`／`engine/recorder.mjs` 裡寫死某個平台的指令（例如 `say`）；平台相關的東西做成插件。
-- 深色版：render／record／voice 都加 `--theme dark`，輸出 `output-dark.mp4`、`output-dark-voice.mp4`。使用者沒說要深色版就只做淺色。
+- 深色版：render／record／voice 都加 `--theme dark`，輸出 `output-dark.mp4`、`<資料夾名>-dark.mp4`。使用者沒說要深色版就只做淺色。
 - 路徑一律用 `path.join`，ffmpeg 清單用 `engine/media.mjs` 的 `concatPath`，Windows 才不會壞。
 
 ## 版面規則（9:16，1080×1920）

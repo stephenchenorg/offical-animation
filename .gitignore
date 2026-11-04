@@ -3,7 +3,7 @@ node_modules/
 .DS_Store
 
 # ===== 產出物（可由腳本 / index.html 重新產生，不進 git）=====
-# 影片成品：output.mp4、output-voice.mp4、成品.mp4、片頭片尾、試聽片段……一律不推
+# 影片成品：output.mp4、<資料夾名>.mp4（有聲版）、成品.mp4、片頭片尾、試聽片段……一律不推
 *.mp4
 *.mov
 *.webm

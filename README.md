@@ -64,7 +64,7 @@ npm run new -- 某客戶-形象介紹        # 1. 從範本開一支新影片 �
 open projects/某客戶-形象介紹/index.html   # 4. 用瀏覽器預覽（點畫面或按 R 重播）
 npm run shots -- projects/某客戶-形象介紹 --shots 3,8,12   # 5. 抽幾個時間點拼成一張圖檢查排版
 npm run render -- projects/某客戶-形象介紹                 # 6. 輸出 projects/某客戶-形象介紹/output.mp4
-npm run voice -- projects/某客戶-形象介紹                  # 7.（選用）加旁白 → output-voice.mp4
+npm run voice -- projects/某客戶-形象介紹                  # 7.（選用）加旁白 → 某客戶-形象介紹.mp4
 ```
 
 需要先裝 ffmpeg：`brew install ffmpeg`。
@@ -131,7 +131,7 @@ AI 機器人：`robot:dim`（沒精神）、`robot:happy`（開心）、`robot:f
 
 ## 旁白（`voice.js`）
 
-`npm run voice -- projects/<名稱>` 會把 `index.html` 裡每一句字幕（`.sub`）念成語音，放在字幕出現的時間點，合進 `output.mp4` 存成 `output-voice.mp4`。字幕框上的說話者（`<b>`）不念。
+`npm run voice -- projects/<名稱>` 會把 `index.html` 裡每一句字幕（`.sub`）念成語音，放在字幕出現的時間點，合進 `output.mp4` 存成跟資料夾同名的 `<名稱>.mp4`（例如 `projects/濂達/不卡控說明/不卡控說明.mp4`，取最後一層資料夾名；已存在就覆寫）。字幕框上的說話者（`<b>`）不念。
 
 - 一句念不完時會自動加快語速（最快 ×1.37），還是念不完就印出警告，這時把字幕時間拉長。
 - 念法跟字幕不一樣（數字、編號、英文縮寫）時，在那個字幕元素加 `data-say="要念的字"`，例如 `data-say="例如零二四七、零六一五五"`。
@@ -204,6 +204,6 @@ scenes/01-總覽.mjs    一幕一個檔：{ title, pages: ['dashboard'], prepare
 
 ## 目前不支援
 
-- **配樂**：沒有背景音樂。要的話把 `output-voice.mp4` 丟進剪映再加。
+- **配樂**：沒有背景音樂。要的話把有聲成品（`<資料夾名>.mp4`）丟進剪映再加。
 - **旁白音色**：內建語音偏機器。要更自然的人聲，用 `tts-edge`，或丟進剪映用 AI 配音。
 - **複雜動作**：例如走路時腿會動、手勢，這類只能用簡單位移代替。
